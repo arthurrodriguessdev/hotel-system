@@ -1,10 +1,12 @@
 using Interfaces;
+using Enums;
 namespace Models
 {
     public class Recepcionista : Pessoa, Interfaces.IRecepcionista{
-        public Recepcionista(string nome, string cpf, string telefone) : base(nome, cpf, telefone)
+        public int IdentificadorRecepcionista;
+        public Recepcionista(string nome, string cpf, string telefone, int identificador) : base(nome, cpf, telefone)
         {
-            
+            IdentificadorRecepcionista = identificador;
         }
 
         public override void Apresentar()
@@ -20,6 +22,35 @@ namespace Models
         public void FalarEmIngles()
         {
             
+        }
+
+        public bool RealizarCheckin(Cliente cliente, List<Reserva> reservas)
+        {
+            if(cliente == null || (!reservas.Any()))
+            {
+                return false;
+            }
+
+            Reserva reservaCliente = null;
+            foreach(var item in reservas)
+            {
+                foreach(var itemClientes in item.Clientes)
+                {
+                    if(itemClientes == cliente)
+                        {
+                            reservaCliente = item;
+                            break;
+                        } 
+                    }
+            }
+
+            if(reservaCliente == null)
+            {
+                return false;
+            }
+
+            reservaCliente.QuartoReservado.Status = StatusQuarto.Ocupado;
+            return true;
         }
     }
 }

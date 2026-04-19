@@ -1,21 +1,22 @@
+using Enums;
 namespace Models
 {
     public class Quarto
     {
         public int Numero;
-        public bool Reservado;
+        public StatusQuarto Status {get; set;}
         public int NumeroMaximoPessoas;
 
         public Quarto(int numero, int quantidadeMaxima)
         {
             Numero = numero;
             NumeroMaximoPessoas = quantidadeMaxima;
-            Reservado = false;
+            Status = StatusQuarto.Livre;
         }
 
-        public bool EstaReservado()
+        public bool EstaDisponivel()
         {
-            if (Reservado)
+            if (Status == StatusQuarto.Livre)
             {
                 return true;
             }
