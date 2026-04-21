@@ -13,6 +13,7 @@ namespace Models
         public IGerente Gerente {get; private set;}
         public List<Quarto> Quartos {get; private set;}
         public List<Reserva> Reservas {get; private set;}
+        public List<LogLimpeza> HistoricoLimpezas {get; private set;}
 
 
         public Hotel(string nome, Endereco endereco, int capacidadeMaxima)
@@ -32,7 +33,7 @@ namespace Models
             return Quartos.Count >= CapacidadeMaximaQuartos;
         }
 
-        public bool AdicionarQuarto(int numeroQuarto, int capacidadeMaximaPessoas)
+        public bool AdicionarQuarto(int numeroQuarto, int capacidadeMaximaPessoas, double valorDiaria)
         {
             if (!EstaLotado())
             {
@@ -45,7 +46,7 @@ namespace Models
                     }
                 }
 
-                Quartos.Add(new Quarto(numeroQuarto, capacidadeMaximaPessoas));
+                Quartos.Add(new Quarto(numeroQuarto, capacidadeMaximaPessoas, valorDiaria));
                 return true;
             }
 
@@ -162,6 +163,11 @@ namespace Models
             }
 
             return recepcionista.RealizarCheckout(quarto);
+        }
+
+        public List<LogLimpeza> ListarHistoricoLimpezaQuarto(int numeroQuarto)
+        {
+            return HistoricoLimpezas.Where(h => h.Quarto == BuscarQuarto(numeroQuarto)).ToList();
         }
     }
 }

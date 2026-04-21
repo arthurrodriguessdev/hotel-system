@@ -5,7 +5,7 @@ namespace Models
     public class Camareira : Pessoa, Interfaces.ICamareira
     {
         public int IdentificadorCamareira;
-        public Camareira(string nome, string cpf, string telefone, int identificador) : base(nome, cpf, telefone)
+        public Camareira(string nome, string cpf, string telefone, int identificador, DateTime data) : base(nome, cpf, telefone, data)
         {
             IdentificadorCamareira = identificador;
         }

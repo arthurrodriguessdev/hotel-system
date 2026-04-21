@@ -2,7 +2,7 @@ namespace Models
 {
     public class Cliente : Pessoa
     {
-        public Cliente(string nome, string cpf, string telefone) : base(nome, cpf, telefone)
+        public Cliente(string nome, string cpf, string telefone, DateTime data) : base(nome, cpf, telefone, data)
         {
             
         }

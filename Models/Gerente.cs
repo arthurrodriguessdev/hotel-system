@@ -3,7 +3,7 @@ namespace Models
 {
     public class Gerente : Pessoa, Interfaces.IGerente
     {
-        public Gerente(string nome, string telefone, string cpf) : base(nome, cpf, telefone)
+        public Gerente(string nome, string telefone, string cpf, DateTime data) : base(nome, cpf, telefone, data)
         {
             
         }
@@ -23,7 +23,7 @@ namespace Models
             
         }
 
-        public void LimparQuarto()
+        public void LimparQuarto(Quarto quarto)
         {
             
         }
