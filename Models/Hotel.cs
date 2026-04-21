@@ -1,3 +1,4 @@
+using System.Reflection.Metadata.Ecma335;
 using Enums;
 using Interfaces;
 namespace Models
@@ -6,46 +7,29 @@ namespace Models
     {
         private string Nome {get; set;}
         private int CapacidadeMaximaQuartos {get;}
-        private static int ContadorQuartos {get; set;}
         public Endereco Endereco {get; set;}
         public List<Recepcionista> Recepcionistas {get; private set;}
-        public List<ICamareira> Camareiras {get; private set;}
+        public List<Camareira> Camareiras {get; private set;}
         public IGerente Gerente {get; private set;}
-        public List<Quarto> Quartos {get; set;}
-        public List<Reserva> Reservas {get; set;}
+        public List<Quarto> Quartos {get; private set;}
+        public List<Reserva> Reservas {get; private set;}
 
 
         public Hotel(string nome, Endereco endereco, int capacidadeMaxima)
         {
             Nome = nome;
             CapacidadeMaximaQuartos = capacidadeMaxima;
-            ContadorQuartos = 0;
             Endereco = endereco;
             Gerente = null; 
             Recepcionistas = new List<Recepcionista>();
-            Camareiras = new List<ICamareira>();
+            Camareiras = new List<Camareira>();
             Quartos = new List<Quarto>();
             Reservas = new List<Reserva>();
         }
 
         public bool EstaLotado()
         {
-            if(ContadorQuartos >= CapacidadeMaximaQuartos)
-            {
-                return true; // Atingiu a capacidade máxima de quartos
-            }
-
-            return false;
-        }
-
-        public bool ExisteQuarto()
-        {
-            if(Hotel.ContadorQuartos >= 1)
-            {
-                return true;
-            }
-
-            return false;
+            return Quartos.Count >= CapacidadeMaximaQuartos;
         }
 
         public bool AdicionarQuarto(int numeroQuarto, int capacidadeMaximaPessoas)
@@ -62,86 +46,96 @@ namespace Models
                 }
 
                 Quartos.Add(new Quarto(numeroQuarto, capacidadeMaximaPessoas));
-                Hotel.ContadorQuartos++;
                 return true;
             }
 
             return false;
         }
 
-        public void ListarQuartosDisponveis()
+        public void AdicionarRecepcionista(Recepcionista recepcionista)
         {
-            if (!ExisteQuarto())
+            if (Recepcionistas.Contains(recepcionista))
             {
+                Console.WriteLine($"Recepcionista: {recepcionista} já faz parte da equipe.");
                 return;
             }
-            
-            var quartosDisponiveis = Quartos.Where(q => q.Status == StatusQuarto.Livre).ToList();
-            foreach(Quarto item in quartosDisponiveis)
-            {
-                Console.WriteLine($"{item}");
-            }
 
+            Recepcionistas.Add(recepcionista);
             return;
         }
 
-        public void ListarQuartosOcupados()
+        public void AdicionarCamareira(Camareira camareira)
         {
-            if (!ExisteQuarto())
+            if (Camareiras.Contains(camareira))
             {
+                Console.WriteLine($"Camareira: {camareira} já faz parte da equipe.");
                 return;
             }
 
-            var quartosOcupados = Quartos.Where(q => q.Status == StatusQuarto.Ocupado).ToList();
-            foreach(Quarto item in quartosOcupados)
-            {
-                Console.WriteLine($"{item}");
-            }
+            Camareiras.Add(camareira);
+            return;
         }
 
-        public Quarto BuscarQuarto(int numeroQuartoBuscado)
+        public void DefinirGerente(Gerente gerente)
         {
-            if (!ExisteQuarto())
+            if(Gerente == gerente)
             {
-                return null;
+                Console.WriteLine($"O gerente: {gerente} já está com essa função.");
+                return;
             }
 
-            return Quartos.SingleOrDefault(q => q.Numero == numeroQuartoBuscado);
+            Gerente = gerente;
+            Console.WriteLine($"Gerente: {gerente} definido com sucesso.");
+            return;
         }
 
-        public bool ReservarQuarto(Quarto quarto, List<Cliente> clientes)
+        public List<Quarto> ListarQuartosDisponveis() => Quartos.Where(q => q.Status == StatusQuarto.Livre).ToList();
+
+        public List<Quarto> ListarQuartosOcupados() => Quartos.Where(q => q.Status == StatusQuarto.Ocupado).ToList();
+
+        public List<Quarto> ListarQuartosSujos() => Quartos.Where(q => q.EstadoLimpeza == EstadoLimpezaQuarto.Sujo).ToList();
+
+        public Quarto BuscarQuarto(int numeroQuartoBuscado) => Quartos.SingleOrDefault(q => q.Numero == numeroQuartoBuscado);
+
+        public bool ReservarQuarto(int numeroQuarto, List<Cliente> clientes, DateTime inicioReserva, DateTime fimReserva)
         {
+            var quarto = BuscarQuarto(numeroQuarto);
             if(quarto == null || clientes == null)
             {
                 return false;
             }
 
-            if(quarto.Status != StatusQuarto.Livre)
-            {
-                return false;
-            }
+            if(inicioReserva >= fimReserva) return false;
+            if(quarto.Status != StatusQuarto.Livre) return false;
+            if(quarto.EstadoLimpeza == EstadoLimpezaQuarto.Sujo) return false;
+            if(clientes.Count > quarto.NumeroMaximoPessoas) return false;
 
-            if(clientes.Count > quarto.NumeroMaximoPessoas)
-            {
-                return false;
-            }
-
-            Reservas.Add(new Reserva(quarto, clientes));
+            Reservas.Add(new Reserva(quarto, clientes, inicioReserva, fimReserva));
             quarto.Status = StatusQuarto.Reservado;
             return true;
         }
 
-        public void ListarRecepcionistas()
+        public IReadOnlyList<Recepcionista> ListarRecepcionistas() => Recepcionistas;
+
+        public IReadOnlyList<Camareira> ListarCamareiras() => Camareiras;
+
+        public Camareira BuscarCamareira(int identificador)
         {
-            if(Recepcionistas.Any())
+            return Camareiras.SingleOrDefault(c => c.IdentificadorCamareira == identificador);
+        }
+
+        public bool DirecionamentoLimpeza(int identificadorCamareira, int numeroQuarto)
+        {
+            var camareiraSelecionada = BuscarCamareira(identificadorCamareira);
+            var quartoLimpar = BuscarQuarto(numeroQuarto);
+            if(camareiraSelecionada == null || quartoLimpar == null)
             {
-                foreach(var item in Recepcionistas)
-                {
-                    Console.WriteLine($"{item}");
-                }
-                return;
+                return false;
             }
-            return;
+
+            camareiraSelecionada.LimparQuarto(quartoLimpar);
+            return true;
+
         }
 
         public Recepcionista BuscarRecepcionista(int identificador)
@@ -152,13 +146,22 @@ namespace Models
         public bool DirecionamentoCheckin(int identificadorRecepcionista, Cliente cliente)
         {   
             var  recepcionista = BuscarRecepcionista(identificadorRecepcionista);
+            if(recepcionista == null) return false;
 
-            if(recepcionista == null)
+            var reservaCliente = Reservas.FirstOrDefault(r => r.Clientes.Any(c => c.CPF == cliente.CPF));
+            return recepcionista.RealizarCheckin(cliente, reservaCliente);
+        }
+
+        public bool DirecionamentoCheckout(int identificadorRecepcionista, int numeroQuarto)
+        {   
+            var quarto = BuscarQuarto(numeroQuarto);
+            var  recepcionista = BuscarRecepcionista(identificadorRecepcionista);
+            if(quarto == null || recepcionista == null)
             {
                 return false;
             }
 
-            return recepcionista.RealizarCheckin(cliente, Reservas);
+            return recepcionista.RealizarCheckout(quarto);
         }
     }
 }

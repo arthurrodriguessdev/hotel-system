@@ -4,7 +4,7 @@ namespace Models
     {
         #region atributos
         protected string Nome {get; set;}
-        protected string CPF {get;}
+        internal string CPF {get;}
         protected string Telefone {get; set;}
         #endregion
         

@@ -14,6 +14,11 @@ namespace Models
             Console.WriteLine($"Olá! Meu nome é {Nome} e eu sou a recepcionsita do hotel");
         }
 
+        public override string ToString()
+        {
+            return $"{IdentificadorRecepcionista} - {Nome}";
+        }
+
         public void AtenderTelefone()
         {
             
@@ -24,33 +29,30 @@ namespace Models
             
         }
 
-        public bool RealizarCheckin(Cliente cliente, List<Reserva> reservas)
+        public bool RealizarCheckin(Cliente cliente, Reserva reservaCliente)
         {
-            if(cliente == null || (!reservas.Any()))
+            if(cliente == null || reservaCliente == null)
             {
                 return false;
             }
 
-            Reserva reservaCliente = null;
-            foreach(var item in reservas)
-            {
-                foreach(var itemClientes in item.Clientes)
-                {
-                    if(itemClientes == cliente)
-                        {
-                            reservaCliente = item;
-                            break;
-                        } 
-                    }
-            }
-
-            if(reservaCliente == null)
-            {
-                return false;
-            }
+            if(reservaCliente.Status == StatusReserva.Inativa) return false;
+            if(reservaCliente.QuartoReservado.Status == StatusQuarto.Ocupado) return false;
 
             reservaCliente.QuartoReservado.Status = StatusQuarto.Ocupado;
             return true;
+        }
+
+        public bool RealizarCheckout(Quarto quartoDesocupar)
+        {
+            if(quartoDesocupar != null && quartoDesocupar.Status == StatusQuarto.Ocupado)
+            {
+                quartoDesocupar.Status = StatusQuarto.Livre;
+                quartoDesocupar.EstadoLimpeza = EstadoLimpezaQuarto.Sujo;
+                return true;
+            }
+
+            return false;
         }
     }
 }
