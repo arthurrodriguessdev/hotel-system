@@ -23,7 +23,7 @@ namespace Models
             
         }
 
-        public void LimparQuarto(Quarto quarto)
+        public void LimparQuarto(Quarto quarto, DateTime dataLimpeza)
         {
             
         }

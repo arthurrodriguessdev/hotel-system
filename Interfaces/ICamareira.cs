@@ -4,6 +4,6 @@ namespace Interfaces
     public interface ICamareira
     {
         void ArrumarCama();
-        void LimparQuarto(Quarto quarto);
+        void LimparQuarto(Quarto quarto, DateTime dataLimpeza);
     }
 }

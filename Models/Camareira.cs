@@ -20,7 +20,7 @@ namespace Models
             return $"{IdentificadorCamareira} - {Nome}";
         }
 
-        public void LimparQuarto(Quarto quartoLimpar)
+        public void LimparQuarto(Quarto quartoLimpar, DateTime dataLimpeza)
         {
             if(quartoLimpar.EstadoLimpeza == EstadoLimpezaQuarto.Limpo)
             {
@@ -35,6 +35,7 @@ namespace Models
             }
 
             quartoLimpar.EstadoLimpeza = EstadoLimpezaQuarto.Limpo;
+            new LogLimpeza(this, dataLimpeza, quartoLimpar);
             Console.WriteLine($"O quarto: {quartoLimpar} foi limpo com sucesso!");
         }
 

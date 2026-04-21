@@ -125,7 +125,7 @@ namespace Models
             return Camareiras.SingleOrDefault(c => c.IdentificadorCamareira == identificador);
         }
 
-        public bool DirecionamentoLimpeza(int identificadorCamareira, int numeroQuarto)
+        public bool DirecionamentoLimpeza(int identificadorCamareira, int numeroQuarto, DateTime dataLimpeza)
         {
             var camareiraSelecionada = BuscarCamareira(identificadorCamareira);
             var quartoLimpar = BuscarQuarto(numeroQuarto);
@@ -134,7 +134,7 @@ namespace Models
                 return false;
             }
 
-            camareiraSelecionada.LimparQuarto(quartoLimpar);
+            camareiraSelecionada.LimparQuarto(quartoLimpar, dataLimpeza);
             return true;
 
         }
